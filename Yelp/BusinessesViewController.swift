@@ -94,11 +94,10 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             term = "Restaurants"
         }
         
-        addAnnotationForBusinesses()
         Business.searchWithTerm(term!, limit: LIMIT_CONSTANT, offset: offset, sort: nil, categories: categories, deals: deals, completion: { (businesses: [Business]!, error: NSError!) -> Void in
                 self.businesses = businesses
+                self.addAnnotationForBusinesses()
                 self.tableView.reloadData()
-            
             if businesses != nil
             {
                 for business in businesses {
@@ -216,14 +215,10 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         if !(annotation is MKPointAnnotation) {
             return nil
         }
-        
-        var view = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView
-        if view == nil
-        {
-            view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
-            view!.canShowCallout = true
-            view!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
-        }
+
+        let view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
+        view.canShowCallout = true
+        view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
         return view
     }
     
@@ -259,15 +254,12 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     func setSearchBar()
     {
         searchBar.sizeToFit()
+        searchBar.barTintColor = UIColor.clearColor()
+        searchBar.backgroundImage = UIImage()
         navigationItem.titleView = searchBar
         searchBar.placeholder = "Search"
     }
-    
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String)
-    {
-        searchBusinesses(searchText, offset: 0, categories: categories, deals: false)
-    }
-    
+ 
     func searchBarTextDidBeginEditing(searchBar: UISearchBar)
     {
         searchBar.setShowsCancelButton(true, animated: true)
@@ -280,14 +272,19 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar)
     {
+        SVProgressHUD.show()
         searchBar.endEditing(true)
         searchBusinesses(searchBar.text, offset: 0, categories: categories, deals: false)
+        SVProgressHUD.dismiss()
     }
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar)
     {
+        SVProgressHUD.show()
+        searchBar.text = nil
         searchBar.endEditing(true)
         searchBusinesses(nil, offset: 0, categories: categories, deals: false)
+        SVProgressHUD.dismiss()
     }
 
     
@@ -296,7 +293,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     {
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 196/255, green: 18/255, blue: 0, alpha: 1.0)
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.searchBar.tintColor = UIColor.whiteColor()
         let view: UIView = self.searchBar.subviews[0] 
         let subViewsArray = view.subviews
         
@@ -323,7 +319,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?)
     {
-        print("yes")
         if let button = sender as? UIBarButtonItem
         {
             if button.image! == UIImage(named: "FiltersIcon")
