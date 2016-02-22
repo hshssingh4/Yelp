@@ -9,7 +9,8 @@
 import UIKit
 import CoreLocation
 
-class Business: NSObject {
+class Business: NSObject
+{
     let name: String?
     let address: String?
     let imageURL: NSURL?
@@ -19,27 +20,35 @@ class Business: NSObject {
     let reviewCount: NSNumber?
     let location: CLLocation?
     
-    init(dictionary: NSDictionary) {
+    init(dictionary: NSDictionary)
+    {
         name = dictionary["name"] as? String
         
         let imageURLString = dictionary["image_url"] as? String
-        if imageURLString != nil {
+        if imageURLString != nil
+        {
             imageURL = NSURL(string: imageURLString!)!
-        } else {
+        }
+        else
+        {
             imageURL = nil
         }
         
         let location = dictionary["location"] as? NSDictionary
         var address = ""
-        if location != nil {
+        if location != nil
+        {
             let addressArray = location!["address"] as? NSArray
-            if addressArray != nil && addressArray!.count > 0 {
+            if addressArray != nil && addressArray!.count > 0
+            {
                 address = addressArray![0] as! String
             }
             
             let neighborhoods = location!["neighborhoods"] as? NSArray
-            if neighborhoods != nil && neighborhoods!.count > 0 {
-                if !address.isEmpty {
+            if neighborhoods != nil && neighborhoods!.count > 0
+            {
+                if !address.isEmpty
+                {
                     address += ", "
                 }
                 address += neighborhoods![0] as! String
@@ -48,29 +57,39 @@ class Business: NSObject {
         self.address = address
         
         let categoriesArray = dictionary["categories"] as? [[String]]
-        if categoriesArray != nil {
+        if categoriesArray != nil
+        {
             var categoryNames = [String]()
-            for category in categoriesArray! {
+            for category in categoriesArray!
+            {
                 let categoryName = category[0]
                 categoryNames.append(categoryName)
             }
             categories = categoryNames.joinWithSeparator(", ")
-        } else {
+        }
+        else
+        {
             categories = nil
         }
         
         let distanceMeters = dictionary["distance"] as? NSNumber
-        if distanceMeters != nil {
+        if distanceMeters != nil
+        {
             let milesPerMeter = 0.000621371
             distance = String(format: "%.2f mi", milesPerMeter * distanceMeters!.doubleValue)
-        } else {
+        }
+        else
+        {
             distance = nil
         }
         
         let ratingImageURLString = dictionary["rating_img_url_large"] as? String
-        if ratingImageURLString != nil {
+        if ratingImageURLString != nil
+        {
             ratingImageURL = NSURL(string: ratingImageURLString!)
-        } else {
+        }
+        else
+        {
             ratingImageURL = nil
         }
         
@@ -89,20 +108,19 @@ class Business: NSObject {
 
     }
     
-    class func businesses(array array: [NSDictionary]) -> [Business] {
+    class func businesses(array array: [NSDictionary]) -> [Business]
+    {
         var businesses = [Business]()
-        for dictionary in array {
+        for dictionary in array
+        {
             let business = Business(dictionary: dictionary)
             businesses.append(business)
         }
         return businesses
     }
     
-    class func searchWithTerm(term: String, limit: Int, offset: Int, completion: ([Business]!, NSError!) -> Void) {
-        YelpClient.sharedInstance.searchWithTerm(term, limit: limit, offset: offset, completion: completion)
-    }
-    
-    class func searchWithTerm(term: String, limit: Int, offset: Int, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: ([Business]!, NSError!) -> Void) -> Void {
+    class func searchWithTerm(term: String, limit: Int, offset: Int, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: ([Business]!, NSError!) -> Void) -> Void
+    {
         YelpClient.sharedInstance.searchWithTerm(term, limit: limit, offset: offset, sort: sort, categories: categories, deals: deals, completion: completion)
     }
 }

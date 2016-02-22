@@ -13,16 +13,19 @@ import UIKit
     optional func switchCell(switchCell: SwitchCell, didChangeValue value: Bool)
 }
 
-class SwitchCell: UITableViewCell {
+class SwitchCell: UITableViewCell
+{
     
     @IBOutlet weak var switchLabel: UILabel!
     @IBOutlet weak var onSwitch: UISwitch!
     
     weak var delegate: SwitchCellDelegate?
     
-    override func awakeFromNib() {
+    override func awakeFromNib()
+    {
         super.awakeFromNib()
         
+        modifySwitch()
         onSwitch.addTarget(self, action: "switchValueChanged", forControlEvents: UIControlEvents.ValueChanged)
     }
     
@@ -31,10 +34,14 @@ class SwitchCell: UITableViewCell {
             delegate?.switchCell?(self, didChangeValue: onSwitch.on)
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(selected: Bool, animated: Bool)
+    {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    }
+    
+    func modifySwitch()
+    {
+        onSwitch.onTintColor = UIColor(red: 156/255, green: 203/255, blue: 255/255, alpha: 1.0)
     }
 
 }

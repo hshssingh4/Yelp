@@ -12,15 +12,16 @@ import SVProgressHUD
 import MapKit
 import CoreLocation
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UIScrollViewDelegate, FiltersViewControllerDelegate, CLLocationManagerDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UIScrollViewDelegate, FiltersViewControllerDelegate, CLLocationManagerDelegate, MKMapViewDelegate
+{
 
     var businesses: [Business]!
     var searchBar = UISearchBar()
     var isMoreDataLoading = false
     var categories: [String]!
-    let LIMIT_CONSTANT = 20
     var locationManager : CLLocationManager!
-    var userLocation: CLLocation!
+    
+    let LIMIT_CONSTANT = 20
     
     @IBOutlet weak var filtersButton: UIBarButtonItem!
     @IBOutlet weak var mapButton: UIBarButtonItem!
@@ -28,7 +29,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var mapView: MKMapView!
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
 
         self.tableView.dataSource = self
@@ -42,40 +44,35 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         searchBar.delegate = self
         
         SVProgressHUD.show()
-        searchBusinesses(nil, offset: 0)
+        searchBusinesses(nil, offset: 0, categories: categories, deals: false)
         SVProgressHUD.dismiss()
         
+        self.mapView.delegate = self
         setLocationManager()
         hideMapView()
         modifyView()
-        
-/* Example of Yelp search with more search options specified
-        Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-            }
-        }
-*/
     }
     
-    override func didReceiveMemoryWarning() {
+    override func didReceiveMemoryWarning()
+    {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if businesses != nil {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    {
+        if businesses != nil
+        {
             return businesses.count
         }
-        else {
+        else
+        {
             return 0
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
+    {
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell", forIndexPath: indexPath) as! BusinessCell
         
         cell.business = businesses[indexPath.row]
@@ -84,15 +81,21 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         return modifiedCell
     }
     
-    // Search for Businesses
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
+    {
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    }
     
-    func searchBusinesses(var term: String?, offset: Int) {
+    // Search for Businesses
+    func searchBusinesses(var term: String?, offset: Int, categories: [String]?, deals: Bool?)
+    {
         
         if term == nil {
             term = "Restaurants"
         }
         
-        Business.searchWithTerm(term!, limit: LIMIT_CONSTANT, offset: offset, completion: { (businesses: [Business]!, error: NSError!) -> Void in
+        addAnnotationForBusinesses()
+        Business.searchWithTerm(term!, limit: LIMIT_CONSTANT, offset: offset, sort: nil, categories: categories, deals: deals, completion: { (businesses: [Business]!, error: NSError!) -> Void in
                 self.businesses = businesses
                 self.tableView.reloadData()
             
@@ -106,66 +109,22 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         })
     }
     
-    // Search Bar Functions
-    
-    func setSearchBar() {
-        searchBar.sizeToFit()
-        navigationItem.titleView = searchBar
-        searchBar.placeholder = "Search"
-    }
-    
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        searchBusinesses(searchText, offset: 0)
-    }
-    
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        searchBar.setShowsCancelButton(true, animated: true)
-    }
-    
-    func searchBarTextDidEndEditing(searchBar: UISearchBar) {
-        searchBar.setShowsCancelButton(false, animated: true)
-    }
-    
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        searchBar.endEditing(true)
-        searchBusinesses(searchBar.text, offset: 0)
-    }
-    
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        searchBar.endEditing(true)
-        searchBusinesses(nil, offset: 0)
-    }
-    
-    func loadMoreData() {
-        
-        // ... Create the NSURLRequest (myRequest) ...
-        /*let requestUrl = NSURL(string: "https://api.yelp.com/v2/search")
-        let myRequest = NSURLRequest(URL: requestUrl!)
-        
-        // Configure session so that completion handler is executed on main UI thread
-        let session = NSURLSession(
-            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
-            delegate:nil,
-            delegateQueue:NSOperationQueue.mainQueue()
-        )
-        
-        let task : NSURLSessionDataTask = session.dataTaskWithRequest(myRequest,
-            completionHandler: { (data, response, error) in
-                
-                // Update flag
-                self.isMoreDataLoading = false
-                
-                // ... Use the new data to update the data source ...
-                
-                
-                // Reload the tableView now that there is new data
-                self.tableView.reloadData()
-        });
-        task.resume()*/
-        Business.searchWithTerm("Restaurants", limit: LIMIT_CONSTANT, offset: 5, sort: nil, categories: categories, deals: nil) { (businesses: [Business]!, error: NSError!) -> Void in
+    func loadMoreData()
+    {
+        var term = String()
+        if let text = searchBar.text
+        {
+            term = text
+        }
+        else
+        {
+            term = "Restaurants"
+        }
+        Business.searchWithTerm(term, limit: LIMIT_CONSTANT, offset: 5, sort: nil, categories: categories, deals: nil) { (businesses: [Business]!, error: NSError!) -> Void in
             if businesses != nil
             {
-                for business in businesses {
+                for business in businesses
+                {
                     self.businesses.append(business)
                 }
             }
@@ -173,10 +132,26 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         self.tableView.reloadData()
     }
     
-    func infiniteScrollingHandler() {
+    func infiniteScrollingHandler()
+    {
         loadMoreData()
         tableView.infiniteScrollingView.stopAnimating()
     }
+    
+    // Filters Return setup
+    func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String : AnyObject])
+    {
+        SVProgressHUD.show()
+        categories = filters["categories"] as? [String]
+        Business.searchWithTerm(searchBar.text!, limit: LIMIT_CONSTANT, offset: 0, sort: nil, categories: categories, deals: nil) { (businesses: [Business]!, error: NSError!) -> Void in
+            self.businesses = businesses
+            self.addAnnotationForBusinesses()
+            self.tableView.reloadData()
+        }
+        SVProgressHUD.dismiss()
+    }
+
+    // Map Setup
     
     @IBAction func mapButtonClicked(sender: AnyObject)
     {
@@ -190,32 +165,148 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
     }
     
+    // Set location manager
+    func setLocationManager()
+    {
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locationManager.distanceFilter = 200
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    // Add lcoation manager methods
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus)
+    {
+        if status == CLAuthorizationStatus.AuthorizedWhenInUse
+        {
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation])
+    {
+        if let location = locations.first
+        {
+            let span = MKCoordinateSpanMake(0.1, 0.1)
+            let region = MKCoordinateRegionMake(location.coordinate, span)
+            mapView.setRegion(region, animated: false)
+        }
+    }
+    
+    func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D, annotationTitle: String, annotationSubtitle: String)
+    {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = annotationTitle
+        annotation.subtitle = annotationSubtitle
+        mapView.addAnnotation(annotation)
+    }
+    
+    func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl)
+    {
+        if control == view.rightCalloutAccessoryView
+        {
+            performSegueWithIdentifier("DetailViewController", sender: view)
+        }
+    }
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView?
+    {
+        if !(annotation is MKPointAnnotation) {
+            return nil
+        }
+        
+        var view = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView
+        if view == nil
+        {
+            view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
+            view!.canShowCallout = true
+            view!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
+        }
+        return view
+    }
+    
+    
+    func addAnnotationForBusinesses()
+    {
+        mapView.removeAnnotations(mapView.annotations) // Remove previous annotations
+        
+        if businesses != nil
+        {
+            for business in businesses
+            {
+                addAnnotationAtCoordinate(business.location!.coordinate, annotationTitle: "\(business.name!)", annotationSubtitle: "\(business.address!)")
+            }
+        }
+    }
+    
+    // Animations for switching between views.
     func hideTableView()
     {
         addAnnotationForBusinesses()
         self.navigationItem.rightBarButtonItem?.image = UIImage(named: "TitleViewIcon")
-        self.navigationItem.titleView = nil
-        self.navigationItem.title = "Map"
         UIView.transitionFromView(tableView, toView: mapView, duration: 1.0, options: UIViewAnimationOptions.ShowHideTransitionViews, completion: nil)
     }
     
     func hideMapView()
     {
         self.navigationItem.rightBarButtonItem?.image = UIImage(named: "MapViewIcon")
-        self.navigationItem.titleView = searchBar
         UIView.transitionFromView(mapView, toView: tableView, duration: 1.0, options: UIViewAnimationOptions.ShowHideTransitionViews, completion: nil)
     }
+    
+    // All the search bar function are beneath
+    func setSearchBar()
+    {
+        searchBar.sizeToFit()
+        navigationItem.titleView = searchBar
+        searchBar.placeholder = "Search"
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String)
+    {
+        searchBusinesses(searchText, offset: 0, categories: categories, deals: false)
+    }
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar)
+    {
+        searchBar.setShowsCancelButton(true, animated: true)
+    }
+    
+    func searchBarTextDidEndEditing(searchBar: UISearchBar)
+    {
+        searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar)
+    {
+        searchBar.endEditing(true)
+        searchBusinesses(searchBar.text, offset: 0, categories: categories, deals: false)
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar)
+    {
+        searchBar.endEditing(true)
+        searchBusinesses(nil, offset: 0, categories: categories, deals: false)
+    }
+
     
     // Modify the look of the page
     func modifyView()
     {
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 196/255, green: 18/255, blue: 0, alpha: 1.0)
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
-
-        self.filtersButton.tintColor = UIColor.whiteColor()
-        self.mapButton.tintColor = UIColor.whiteColor()
         self.searchBar.tintColor = UIColor.whiteColor()
+        let view: UIView = self.searchBar.subviews[0] 
+        let subViewsArray = view.subviews
+        
+        for subView: UIView in subViewsArray
+        {
+            if subView.isKindOfClass(UITextField)
+            {
+                subView.tintColor = UIColor.blackColor()
+            }
+        }
     }
     
     func modifyCell(cell: BusinessCell) -> BusinessCell
@@ -223,7 +314,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         cell.preservesSuperviewLayoutMargins = false
         cell.separatorInset = UIEdgeInsetsZero
         cell.layoutMargins = UIEdgeInsetsZero
-        
         return cell
     }
     
@@ -231,8 +321,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?)
+    {
+        print("yes")
         if let button = sender as? UIBarButtonItem
         {
             if button.image! == UIImage(named: "FiltersIcon")
@@ -242,68 +333,24 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
                 filtersViewController.delegate = self
             }
         }
-    }
-    
-    func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String : AnyObject])
-    {
-        SVProgressHUD.show()
-        categories = filters["categories"] as? [String]
-        Business.searchWithTerm("Restaurants", limit: LIMIT_CONSTANT, offset: 0, sort: nil, categories: categories, deals: nil) { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            self.addAnnotationForBusinesses()
-            self.tableView.reloadData()
-        }
-        SVProgressHUD.dismiss()
-    }
-    
-    // Set location manager
-    func setLocationManager()
-    {
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        locationManager.distanceFilter = 200
-        locationManager.requestWhenInUseAuthorization()
-        
-        addAnnotationForBusinesses()
-    }
-    
-    // Add lcoation manager methods
-    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        if status == CLAuthorizationStatus.AuthorizedWhenInUse {
-            locationManager.startUpdatingLocation()
-        }
-    }
-    
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let span = MKCoordinateSpanMake(0.1, 0.1)
-            let region = MKCoordinateRegionMake(location.coordinate, span)
-            userLocation = location
-            mapView.setRegion(region, animated: false)
-        }
-    }
-    
-    func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D, annotationTitle: String) {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = coordinate
-        annotation.title = annotationTitle
-        mapView.addAnnotation(annotation)
-    }
-
-
-    func addAnnotationForBusinesses()
-    {
-        mapView.removeAnnotations(mapView.annotations) // Remove previous annotations
-        
-        if businesses != nil
+        else if let cell = sender as? UITableViewCell
         {
+            let indexPath = tableView.indexPathForCell(cell)
+            let selectedCell = businesses![indexPath!.row]
+            let detailViewController = segue.destinationViewController as! DetailViewController
+            detailViewController.business = selectedCell
+        }
+        else if let annotationView = sender as? MKAnnotationView
+        {
+            let detailViewController = segue.destinationViewController as! DetailViewController
             for business in businesses
             {
-                addAnnotationAtCoordinate(business.location!.coordinate, annotationTitle: business.name!)
+                if annotationView.annotation?.title! == business.name!
+                {
+                    detailViewController.business = business
+                }
             }
         }
+        
     }
-    
-
 }

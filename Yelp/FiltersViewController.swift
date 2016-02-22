@@ -13,7 +13,8 @@ import UIKit
     optional func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String:AnyObject])
 }
 
-class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SwitchCellDelegate {
+class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SwitchCellDelegate
+{
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -21,7 +22,8 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     var switchStates = [Int:Bool]()
     weak var delegate: FiltersViewControllerDelegate?
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
         
         categories = yelpCategories()
@@ -31,16 +33,19 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
         modifyView()
     }
 
-    override func didReceiveMemoryWarning() {
+    override func didReceiveMemoryWarning()
+    {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func onCancelButton(sender: AnyObject) {
+    @IBAction func onCancelButton(sender: AnyObject)
+    {
         dismissViewControllerAnimated(true, completion: nil)
     }
 
-    @IBAction func onSearchButton(sender: AnyObject) {
+    @IBAction func onSearchButton(sender: AnyObject)
+    {
         dismissViewControllerAnimated(true, completion: nil)
         var filters = [String : AnyObject]()
         var selectedCategories = [String]()
@@ -81,7 +86,8 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
         return modifiedCell
     }
     
-    func switchCell(switchCell: SwitchCell, didChangeValue value: Bool) {
+    func switchCell(switchCell: SwitchCell, didChangeValue value: Bool)
+    {
         let indexPath = tableView.indexPathForCell(switchCell)!
         
         switchStates[indexPath.row] = value
@@ -98,9 +104,12 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func modifyCell(cell: SwitchCell) -> SwitchCell
     {
-        if #available(iOS 8.2, *) {
+        if #available(iOS 8.2, *)
+        {
             cell.switchLabel.font = UIFont.systemFontOfSize(17, weight: UIFontWeightSemibold)
-        } else {
+        }
+        else
+        {
             // Keep it regular.
         }
         

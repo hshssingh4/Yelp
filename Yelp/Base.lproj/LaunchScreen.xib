@@ -9,14 +9,14 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="603" height="624"/>
+            <rect key="frame" x="0.0" y="0.0" width="540" height="628"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="Q5H-Sq-1PJ">
-                    <rect key="frame" x="111" y="112" width="381" height="400"/>
+                    <rect key="frame" x="20" y="169" width="500" height="284"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="Q5H-Sq-1PJ" secondAttribute="height" multiplier="15:16" id="aU9-Iy-qwS"/>
-                        <constraint firstAttribute="width" secondItem="Q5H-Sq-1PJ" secondAttribute="height" multiplier="15:16" constant="6.25" id="uSG-Kv-2ZX"/>
+                        <constraint firstAttribute="width" secondItem="Q5H-Sq-1PJ" secondAttribute="height" multiplier="15:16" constant="233.75" id="uSG-Kv-2ZX"/>
                     </constraints>
                     <variation key="default">
                         <mask key="constraints">
@@ -30,7 +30,7 @@
                 <constraint firstItem="Q5H-Sq-1PJ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="53" id="5uP-eD-rpe"/>
                 <constraint firstAttribute="trailing" secondItem="Q5H-Sq-1PJ" secondAttribute="trailing" constant="52" id="ZHu-0t-LGW"/>
                 <constraint firstAttribute="bottom" secondItem="Q5H-Sq-1PJ" secondAttribute="bottom" constant="40" id="iKf-yQ-dDw"/>
-                <constraint firstItem="Q5H-Sq-1PJ" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="k6M-af-9XM"/>
+                <constraint firstItem="Q5H-Sq-1PJ" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="-3" id="k6M-af-9XM"/>
                 <constraint firstItem="Q5H-Sq-1PJ" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="ks5-2G-E8d"/>
                 <constraint firstItem="Q5H-Sq-1PJ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="40" id="kuS-iq-uk4"/>
             </constraints>
@@ -44,10 +44,10 @@
                     <exclude reference="kuS-iq-uk4"/>
                 </mask>
             </variation>
-            <point key="canvasLocation" x="609.5" y="527"/>
+            <point key="canvasLocation" x="609" y="529"/>
         </view>
     </objects>
     <resources>
-        <image name="LaunchImage" width="375" height="400"/>
+        <image name="LaunchImage" width="500" height="284"/>
     </resources>
 </document>

@@ -8,7 +8,8 @@
 
 import UIKit
 
-class BusinessCell: UITableViewCell {
+class BusinessCell: UITableViewCell
+{
 
     @IBOutlet weak var thumbImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
@@ -18,8 +19,10 @@ class BusinessCell: UITableViewCell {
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var categoriesLabel: UILabel!
     
-    var business: Business! {
-        didSet {
+    var business: Business!
+    {
+        didSet
+        {
             nameLabel.text = business.name
             if let imageURL = business.imageURL
             {
@@ -33,24 +36,25 @@ class BusinessCell: UITableViewCell {
         }
     }
     
-    override func awakeFromNib() {
+    override func awakeFromNib()
+    {
         super.awakeFromNib()
         // Initialization code
         thumbImageView.layer.cornerRadius = 5
         thumbImageView.clipsToBounds = true
-        
         nameLabel.preferredMaxLayoutWidth = nameLabel.frame.size.width
     }
     
-    override func layoutSubviews() {
+    override func layoutSubviews()
+    {
         super.layoutSubviews()
-        
         nameLabel.preferredMaxLayoutWidth = nameLabel.frame.size.width
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(selected: Bool, animated: Bool)
+    {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
     }
 
